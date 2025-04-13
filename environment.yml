@@ -1,0 +1,6 @@
+name: jh_ghp
+dependencies:
+  - python==3.12
+  - pip
+  - pip:
+    - compas_model
