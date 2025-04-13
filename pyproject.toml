@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = ""
+Homepage = "https://github.com/jonashaldemann/jh_ghp_tools"
 Repository = "https://github.com/jonashaldemann/jh_ghp_tools"
 
 # ============================================================================
