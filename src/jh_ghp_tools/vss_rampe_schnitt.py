@@ -2,6 +2,17 @@ import ghpythonlib.components as gh
 
 
 def rampe_im_schnitt(geschosshoehe, gefaelle):
+    """
+    Konstruktion einer Rampe im Schnitt gemäss VSS-Norm mit Abgerundeten Kuppen.
+    Args:
+        geschosshoehe (float): Die Höhe des Geschosses, die die vertikale Distanz der Rampe definiert.
+        gefaelle (float): Das Gefälle der Rampe in Grad, das die Neigung der Rampe bestimmt.
+    Returns:
+        tuple: Ein Tupel bestehend aus:
+            - rampe (Curve): Die erzeugte Rampe als Kurve.
+            - laenge (float): Die horizontale Länge der Rampe.
+    """
+
     # Punkte definieren
     p1 = gh.ConstructPoint(-20, 0, 0)
     p2 = gh.ConstructPoint(0, 0, 0)

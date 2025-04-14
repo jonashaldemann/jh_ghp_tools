@@ -2,6 +2,20 @@ import ghpythonlib.components as gh
 import math
 
 def parkierungsnorm(Gv, W, Pf, U, V):
+    """
+    Berechnet Parkierungsszenarien basierend auf der VSS-Norm.
+    Args:
+        Gv (bool): Gibt an, ob Gegenverkehr berücksichtigt werden soll. 
+                   Wenn True, wird die Mindestbreite der Fahrgasse auf 5.50 gesetzt, falls sie kleiner ist.
+        W (float): Winkel der Parkplätze in Grad (z. B. 90, 75, 70, 60, 45, 30).
+        Pf (float): Breite eines Parkfeldes in Metern (z. B. 2.50, 2.55, 2.60, etc.).
+        U (int): Anzahl der Parkreihen in U-Richtung.
+        V (int): Anzahl der Parkplätze in V-Richtung.
+    Returns:
+        tuple:
+            - Geo (list): Liste von Rechtecken (geometrische Objekte), die die Parkplätze darstellen.
+            - Info (str): Information über die berechnete Fahrgassenbreite.
+    """
 
     # Fixe Werte
     parkfeldlaenge = 5.00
