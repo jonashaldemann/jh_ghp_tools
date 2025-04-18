@@ -4,6 +4,7 @@ from .vss_parkierungsnorm import parkierungsnorm
 from .vss_rampe_schnitt import rampe_im_schnitt
 from .zweistundenschatten import zweistundenschatten
 from .schatten import schatten
+from .volumen_slicen import volumen_slicen
 
 
 
@@ -20,4 +21,5 @@ __all__ = [
     "rampe_im_schnitt",
     "zweistundenschatten",
     "schatten",
+    "volumen_slicen",
 ]
