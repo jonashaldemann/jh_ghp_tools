@@ -1,9 +1,10 @@
 import ghpythonlib.components as gh
 
+
 def volumen_slicen(breps, h_eg, h_og, h_tot):
     """
     Berechnet Volumen-Schnitte und extrudiert diese basierend auf Eingabe-Breps.
-    
+
     Args:
         breps (list): Eingabe-Breps.
         h_eg (float): Höhe des Erdgeschosses.
@@ -17,7 +18,9 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
     storeys = int(h_tot / 2.5)
 
     # Ebenen für jede Etage erstellen
-    storey_base_heights = [schnitthoehe] + [h_eg + schnitthoehe + h_og * i for i in range(storeys)]
+    storey_base_heights = [schnitthoehe] + [
+        h_eg + schnitthoehe + h_og * i for i in range(storeys)
+    ]
     planes = gh.XYPlane(gh.ConstructPoint(0, 0, storey_base_heights))
 
     # Schnittkurven berechnen
@@ -26,7 +29,7 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
         try:
             x_curve, _ = gh.BrepXPlane(brep, planes)
             x_curves.extend(x_curve)
-        except:
+        except Exception:
             pass
 
     # Flächen und Zentroiden berechnen

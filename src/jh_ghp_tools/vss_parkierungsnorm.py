@@ -1,11 +1,12 @@
 import ghpythonlib.components as gh
 import math
 
+
 def parkierungsnorm(Gv, W, Pf, U, V):
     """
     Berechnet Parkierungsszenarien basierend auf der VSS-Norm.
     Args:
-        Gv (bool): Gibt an, ob Gegenverkehr berücksichtigt werden soll. 
+        Gv (bool): Gibt an, ob Gegenverkehr berücksichtigt werden soll.
                    Wenn True, wird die Mindestbreite der Fahrgasse auf 5.50 gesetzt, falls sie kleiner ist.
         W (float): Winkel der Parkplätze in Grad (z. B. 90, 75, 70, 60, 45, 30).
         Pf (float): Breite eines Parkfeldes in Metern (z. B. 2.50, 2.55, 2.60, etc.).
@@ -20,7 +21,7 @@ def parkierungsnorm(Gv, W, Pf, U, V):
     # Fixe Werte
     parkfeldlaenge = 5.00
     winkel_rad = math.radians(90 - W)
-    origin = gh.ConstructPoint(0,0,0)
+    origin = gh.ConstructPoint(0, 0, 0)
 
     d_pf = {
         90: {2.50: 6.50, 2.55: 6.25, 2.60: 6.00, 2.65: 5.75, 2.70: 5.50, 2.75: 5.25, 2.80: 5.00},
@@ -28,7 +29,7 @@ def parkierungsnorm(Gv, W, Pf, U, V):
         70: {2.50: 4.50, 2.70: 4.00},
         60: {2.50: 3.50, 2.80: 3.20},
         45: {2.50: 3.20},
-        30: {2.50: 3.20}
+        30: {2.50: 3.20},
     }
 
     # Fahrgasse auslesen ohne Fallback-Wert ("")
@@ -52,7 +53,7 @@ def parkierungsnorm(Gv, W, Pf, U, V):
         wert += x_versatz + (fahrgasse + fahrgassenzuschlag if i % 2 == 0 else 0)
 
     # V-Richtung
-    shift = Pf/math.cos(winkel_rad)
+    shift = Pf / math.cos(winkel_rad)
     series_v = [i * shift for i in range(V)]
 
     # Punktgitter

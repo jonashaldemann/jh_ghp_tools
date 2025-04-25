@@ -1,5 +1,4 @@
 import Rhino
-import math
 import System
 import ghpythonlib.components as gh
 
@@ -7,15 +6,15 @@ import ghpythonlib.components as gh
 def schatten(brep, time):
     """
     Berechnet den Schatten eines Objektes B zu einer bestimmten Zeit t.
-    
+
     Args:
-        B: Das Objekt, dessen Schatten berechnet werden soll.
-        t: Zeit in Stunden (z.B. 8.0 für 08:00 Uhr).
-        
+        brep: Das Objekt, dessen Schatten berechnet werden soll.
+        time: Zeit in Stunden (z.B. 8.0 für 08:00 Uhr).
+
     Returns:
-        S: Die berechneten Schattenflächen.
+        tuple: Ein Tupel bestehend aus dem Schattenvektor und den berechneten Schattenflächen.
     """
-    
+
     # Main Settings
     step = 1
     stunden = 2
@@ -27,19 +26,14 @@ def schatten(brep, time):
     sun.Timezone = 1.0
 
     # Generate hourly series
-    stundenserie = [time + i * step for i in range(int((stunden) / step) + 1)]
-    
-    # Plane and point for projection
+    stundenserie = [time + i * step for i in range(int(stunden / step) + 1)]
 
-    pt = gh.ConstructPoint(0,0,0)
+    # Plane and point for projection
+    pt = gh.ConstructPoint(0, 0, 0)
     pl = gh.XYPlane(pt)
 
-    sun = Rhino.RhinoDoc.ActiveDoc.RenderSettings.Sun
-
     h = int(time)
-    m = int((time-h) * 60)
-
-    print(h, m)
+    m = int((time - h) * 60)
 
     # Bern, MEZ UTC+1
     latitude = 46.9481
@@ -47,17 +41,14 @@ def schatten(brep, time):
     timezone = 1.0
     datetime = System.DateTime(2025, 10, 29, h, m, 0, System.DateTimeKind.Unspecified)
 
-
     sun.Longitude = longitude
     sun.Latitude = latitude
     sun.Timezone = timezone
     sun.SetDateTime(datetime, datetime.Kind)
 
     vec = sun.Vector
-    brep = gh.ProjectAlong(brep, pl, vec)[0]
-    regions = gh.DeconstructBrep(brep)[0]
+    projected_brep = gh.ProjectAlong(brep, pl, vec)[0]
+    regions = gh.DeconstructBrep(projected_brep)[0]
     surface = gh.RegionUnion(regions)
 
     return vec, surface
-
-

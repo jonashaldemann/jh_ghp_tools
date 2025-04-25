@@ -6,16 +6,16 @@ import ghpythonlib.components as gh
 def zweistundenschatten(B, start, end):
     """
     Berechnet den Schatten eines Objektes B in einem Zeitraum von 2 Stunden.
-    
+
     Args:
         B: Das Objekt, dessen Schatten berechnet werden soll.
         start: Startzeit in Stunden (z.B. 8.0 für 08:00 Uhr).
-        end: Endzeit in Stunden (z.B.18.0 für 18:00 Uhr).
-        
+        end: Endzeit in Stunden (z.B. 18.0 für 18:00 Uhr).
+
     Returns:
         schatten: Die berechneten Schattenflächen.
     """
-    
+
     # Main Settings
     step = 1
     stunden = 2
