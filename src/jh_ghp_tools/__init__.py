@@ -6,6 +6,7 @@ from .zweistundenschatten import zweistundenschatten
 from .schatten import schatten
 from .volumen_slicen import volumen_slicen
 from .instant_huesli import instant_huesli
+from .wohnungsteilung import wohnungsteilung
 
 
 
@@ -23,5 +24,6 @@ __all__ = [
     "zweistundenschatten",
     "schatten",
     "volumen_slicen",
-    "instant_huesli"
+    "instant_huesli",
+    "wohnungsteilung"
 ]
