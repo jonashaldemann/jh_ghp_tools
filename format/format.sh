@@ -1,3 +1,3 @@
 #!/bin/bash
 echo "Running Black..."
-black .
+black "$(dirname "$0")/.."

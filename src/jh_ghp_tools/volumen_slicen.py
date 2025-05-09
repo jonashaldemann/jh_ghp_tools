@@ -19,9 +19,7 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
     storeys = int(h_tot / 2.5)
 
     # Ebenen für jede Etage erstellen
-    storey_base_heights = [schnitthoehe] + [
-        h_eg + schnitthoehe + h_og * i for i in range(storeys)
-    ]
+    storey_base_heights = [schnitthoehe] + [h_eg + schnitthoehe + h_og * i for i in range(storeys)]
     planes = [rg.Plane(rg.Point3d(0, 0, height), rg.Vector3d.ZAxis) for height in storey_base_heights]
 
     # Schnittkurven berechnen
@@ -31,7 +29,7 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
             curves = rg.Brep.CreateContourCurves(brep, plane)
             if curves:
                 x_curves.extend(curves)
-    
+
     # Flächen
     areas = []
     curve_data = []
@@ -46,7 +44,7 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
 
     total_area = sum(areas)
     total_area_str = f"{round(total_area)} m²"
-    
+
     # Extrusionen
     breps_new = []
     for crv, pt in curve_data:
