@@ -1,4 +1,5 @@
 import ghpythonlib.components as gh
+import Rhino.Geometry as rg
 
 
 def volumen_slicen(breps, h_eg, h_og, h_tot):
@@ -21,40 +22,40 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
     storey_base_heights = [schnitthoehe] + [
         h_eg + schnitthoehe + h_og * i for i in range(storeys)
     ]
-    planes = gh.XYPlane(gh.ConstructPoint(0, 0, storey_base_heights))
+    planes = [rg.Plane(rg.Point3d(0, 0, height), rg.Vector3d.ZAxis) for height in storey_base_heights]
 
     # Schnittkurven berechnen
     x_curves = []
     for brep in breps:
-        try:
-            x_curve, _ = gh.BrepXPlane(brep, planes)
-            x_curves.extend(x_curve)
-        except Exception:
-            pass
+        for plane in planes:
+            curves = rg.Brep.CreateContourCurves(brep, plane)
+            if curves:
+                x_curves.extend(curves)
+    
+    # Flächen
+    areas = []
+    curve_data = []
+    for crv in x_curves:
+        if crv.IsClosed and crv.IsPlanar():
+            area_props = rg.AreaMassProperties.Compute(crv)
+            if area_props:
+                area = area_props.Area
+                endpoint = crv.PointAtEnd
+                areas.append(area)
+                curve_data.append((crv, endpoint))
 
-    # Flächen und Zentroiden berechnen
-    areas, centroids = gh.Area(x_curves)
-    total_area, _ = gh.MassAddition(areas)
+    total_area = sum(areas)
     total_area_str = f"{round(total_area)} m²"
+    
+    # Extrusionen
+    breps_new = []
+    for crv, pt in curve_data:
 
-    # Extrusionshöhen bestimmen
-    extrusion_heights = [
-        h_eg if pt.Z < schnitthoehe + 0.1 else h_og for pt in centroids
-    ]
-
-    # Korrektur der Schnittkurven basierend auf Brep-Containment
-    corrected_x_curves = []
-    new_extrusion_heights = []
-    for crv, centroid, height in zip(x_curves, centroids, extrusion_heights):
-        moved_pt, _ = gh.Move(centroid, gh.UnitZ(height - schnitthoehe - 0.01))
-        containment, _ = gh.PointInBreps(breps, moved_pt, True)
-        if containment:
-            corrected_x_curves.append(crv)
-            new_extrusion_heights.append(height)
-
-    # Extrudieren und Breps erstellen
-    vectors = gh.UnitZ(new_extrusion_heights)
-    open_breps = gh.Extrude(corrected_x_curves, vectors)
-    breps_new = gh.CapHoles(open_breps)
+        height = h_eg if pt.Z < schnitthoehe + 0.1 else h_og
+        extrusion = rg.Extrusion.Create(crv, height, True)
+        print(extrusion)
+        if extrusion:
+            brep_capped = extrusion.ToBrep()
+            breps_new.append(brep_capped)
 
     return breps_new, total_area_str
