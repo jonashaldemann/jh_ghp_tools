@@ -15,45 +15,43 @@ def volumen_slicen(breps, h_eg, h_og, h_tot):
     Returns:
         tuple: (Liste der neuen Breps, Gesamtfläche als String)
     """
-    schnitthoehe = 0.1
+    schnitthoehe = 0.01
     storeys = int(h_tot / 2.5)
 
     # Ebenen für jede Etage erstellen
     storey_base_heights = [schnitthoehe] + [h_eg + schnitthoehe + h_og * i for i in range(storeys)]
     planes = [rg.Plane(rg.Point3d(0, 0, height), rg.Vector3d.ZAxis) for height in storey_base_heights]
+    storeys = ['EG0'] + [f'OG{i}' for i in range(1, len(storey_base_heights) + 1)]
+
 
     # Schnittkurven berechnen
     x_curves = []
-    for brep in breps:
-        for plane in planes:
+    areas = []
+    tabelle = []
+    for plane, storey in zip(planes, storeys):
+        storey_curves = []
+        for brep in breps:
             curves = rg.Brep.CreateContourCurves(brep, plane)
             if curves:
-                x_curves.extend(curves)
-
-    # Flächen
-    areas = []
-    curve_data = []
-    for crv in x_curves:
-        if crv.IsClosed and crv.IsPlanar():
-            area_props = rg.AreaMassProperties.Compute(crv)
+                storey_curves.extend(curves)
+        
+        storey_area = []
+        for storey_curve in storey_curves:
+            area_props = rg.AreaMassProperties.Compute(storey_curve)
             if area_props:
-                area = area_props.Area
-                endpoint = crv.PointAtEnd
-                areas.append(area)
-                curve_data.append((crv, endpoint))
-
+                storey_area.append(area_props.Area)
+        
+        storey_area = sum(storey_area)
+        areas.append(storey_area)
+        
+        if storey_area > 0:
+            tabelle.append(f"{storey} {int(storey_area)} m²")
+        
+        if storey_curves:
+            x_curves.extend(storey_curves)
+    
     total_area = sum(areas)
-    total_area_str = f"{round(total_area)} m²"
+    total_area_str = f"ist {round(total_area)} m²"
 
-    # Extrusionen
-    breps_new = []
-    for crv, pt in curve_data:
 
-        height = h_eg if pt.Z < schnitthoehe + 0.1 else h_og
-        extrusion = rg.Extrusion.Create(crv, height, True)
-        print(extrusion)
-        if extrusion:
-            brep_capped = extrusion.ToBrep()
-            breps_new.append(brep_capped)
-
-    return breps_new, total_area_str
+    return x_curves, total_area_str, tabelle
