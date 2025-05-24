@@ -1,4 +1,5 @@
 import ghpythonlib.components as gh
+import math
 
 
 def rampe_im_schnitt(geschosshoehe, gefaelle):
@@ -12,13 +13,15 @@ def rampe_im_schnitt(geschosshoehe, gefaelle):
             - rampe (Curve): Die erzeugte Rampe als Kurve.
             - laenge (float): Die horizontale Länge der Rampe.
     """
+    gefaelle_grad = math.atan(gefaelle / 100)
+    print(gefaelle_grad)
 
     # Punkte definieren
     p1 = gh.ConstructPoint(-20, 0, 0)
     p2 = gh.ConstructPoint(0, 0, 0)
 
     # Rampe konstruieren
-    v = gh.Rotate(gh.UnitX(1), -gh.Radians(gefaelle), gh.XYPlane(p2))[0]
+    v = gh.Rotate(gh.UnitX(1), -gefaelle_grad, gh.XYPlane(p2))[0]
     vx, vy, _ = gh.DeconstructVector(v)
     laenge_provisorisch = vx / -vy * geschosshoehe
 

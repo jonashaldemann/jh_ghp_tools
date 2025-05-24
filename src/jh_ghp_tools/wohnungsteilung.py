@@ -26,6 +26,7 @@ def wohnungsteilung(module_sizes, total_area, max_residual):
     results.sort(key=lambda x: x[1])
 
     # Ergebnisse ausgeben
+    print(f"Gesamtfläche: {int(total_area)} m²")
     print(f"Modulkombinationen mit max. {max_residual} m² Restfläche:")
     for combo, residual in results:
         module_list = [f"{n} x {int(size)} m²" for n, size in zip(combo, module_sizes) if n > 0]
