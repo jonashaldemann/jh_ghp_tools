@@ -13,8 +13,9 @@ def rampe_im_schnitt(geschosshoehe, gefaelle):
             - rampe (Curve): Die erzeugte Rampe als Kurve.
             - laenge (float): Die horizontale Länge der Rampe.
     """
+    
+    # Umwandlung des Gefälles in Bogenmass
     gefaelle_grad = math.atan(gefaelle / 100)
-    print(gefaelle_grad)
 
     # Punkte definieren
     p1 = gh.ConstructPoint(-20, 0, 0)
