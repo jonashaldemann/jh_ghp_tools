@@ -3,7 +3,9 @@ import rhinoscriptsyntax as rs
 
 # Select file path in Rhino
 def get_file_path():
-    file_path = rs.OpenFileName("Select a file with coordinates", filter="Text Files (*.txt)|*.txt||")
+    file_path = rs.OpenFileName(
+        "Select a file with coordinates", filter="Text Files (*.txt)|*.txt||"
+    )
     return file_path
 
 

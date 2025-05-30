@@ -70,15 +70,16 @@ replace = "[{new_version}] {now:%Y-%m-%d}"
 # ============================================================================
 
 [tool.black]
-line-length = 179
+line-length = 88
 
 [tool.ruff]
-line-length = 179
+line-length = 88
 indent-width = 4
 target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["I001"]
@@ -95,14 +96,14 @@ known-first-party = [
 convention = "numpy"
 
 [tool.ruff.lint.pycodestyle]
-max-doc-length = 179
+max-doc-length = 88
 
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.isort]
-line_length = 179
+line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0

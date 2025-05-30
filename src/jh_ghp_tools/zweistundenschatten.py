@@ -34,7 +34,9 @@ def zweistundenschatten(B, start, end):
     # Calculate shadow regions
     for t in stundenserie:
         h, m = divmod(int(t * 60), 60)
-        datetime = System.DateTime(2025, 10, 29, h, m, 0, System.DateTimeKind.Unspecified)
+        datetime = System.DateTime(
+            2025, 10, 29, h, m, 0, System.DateTimeKind.Unspecified
+        )
         sun.SetDateTime(datetime, datetime.Kind)
         vec = sun.Vector
         brep = gh.ProjectAlong(B, pl, vec)[0]
@@ -42,11 +44,18 @@ def zweistundenschatten(B, start, end):
         regions.append(gh.RegionUnion(region))
 
     # Find intersection points of shadows
-    match_points = [pt for i in range(len(regions) - stunden) if regions[i] and regions[i + stunden] for pt in gh.MultipleCurves([regions[i], regions[i + stunden]])[0]]
+    match_points = [
+        pt
+        for i in range(len(regions) - stunden)
+        if regions[i] and regions[i + stunden]
+        for pt in gh.MultipleCurves([regions[i], regions[i + stunden]])[0]
+    ]
 
     # Filter points outside the footprint
     distances = gh.BrepClosestPoint(match_points, B)[2]
-    match_points_outer = [point for point, dist in zip(match_points, distances) if dist > 0.1]
+    match_points_outer = [
+        point for point, dist in zip(match_points, distances) if dist > 0.1
+    ]
 
     # Cut shadow polygons and calculate X-hour shadow
     split_crv = gh.PolyLine(match_points_outer, False)

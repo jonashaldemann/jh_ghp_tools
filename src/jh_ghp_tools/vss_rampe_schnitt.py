@@ -2,7 +2,7 @@ import ghpythonlib.components as gh
 import math
 
 
-def rampe_im_schnitt(geschosshoehe, gefaelle):
+def vss_rampe_im_schnitt(geschosshoehe, gefaelle):
     """
     Konstruktion einer Rampe im Schnitt gemäss VSS-Norm mit Abgerundeten Kuppen.
     Args:
@@ -13,7 +13,7 @@ def rampe_im_schnitt(geschosshoehe, gefaelle):
             - rampe (Curve): Die erzeugte Rampe als Kurve.
             - laenge (float): Die horizontale Länge der Rampe.
     """
-    
+
     # Umwandlung des Gefälles in Bogenmass
     gefaelle_grad = math.atan(gefaelle / 100)
 

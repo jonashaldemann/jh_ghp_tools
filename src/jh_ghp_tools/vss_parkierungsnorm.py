@@ -2,7 +2,7 @@ import ghpythonlib.components as gh
 import math
 
 
-def parkierungsnorm(Gv, W, Pf, U, V):
+def vss_parkierungsnorm(Gv, W, Pf, U, V):
     """
     Berechnet Parkierungsszenarien basierend auf der VSS-Norm.
     Args:
@@ -21,10 +21,17 @@ def parkierungsnorm(Gv, W, Pf, U, V):
     # Fixe Werte
     parkfeldlaenge = 5.00
     winkel_rad = math.radians(90 - W)
-    origin = gh.ConstructPoint(0, 0, 0)
 
     d_pf = {
-        90: {2.50: 6.50, 2.55: 6.25, 2.60: 6.00, 2.65: 5.75, 2.70: 5.50, 2.75: 5.25, 2.80: 5.00},
+        90: {
+            2.50: 6.50,
+            2.55: 6.25,
+            2.60: 6.00,
+            2.65: 5.75,
+            2.70: 5.50,
+            2.75: 5.25,
+            2.80: 5.00,
+        },
         75: {2.50: 5.00, 2.65: 4.50},
         70: {2.50: 4.50, 2.70: 4.00},
         60: {2.50: 3.50, 2.80: 3.20},

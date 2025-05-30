@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
-from .vss_parkierungsnorm import parkierungsnorm
-from .vss_rampe_schnitt import rampe_im_schnitt
+from .vss_parkierungsnorm import vss_parkierungsnorm
+from .vss_rampe_schnitt import vss_rampe_im_schnitt
 from .zweistundenschatten import zweistundenschatten
 from .schatten import schatten
 from .volumen_slicen import volumen_slicen
@@ -19,4 +19,14 @@ __version__ = "0.1.0"
 
 HERE = os.path.dirname(__file__)
 
-__all__ = ["vss_parkierungsnorm", "rampe_im_schnitt", "zweistundenschatten", "schatten", "volumen_slicen", "instant_huesli", "wohnungsteilung", "apply_box_mapping", "gekritzel_aus_punkten"]
+__all__ = [
+    "vss_parkierungsnorm",
+    "vss_rampe_im_schnitt",
+    "zweistundenschatten",
+    "schatten",
+    "volumen_slicen",
+    "instant_huesli",
+    "wohnungsteilung",
+    "apply_box_mapping",
+    "gekritzel_aus_punkten",
+]

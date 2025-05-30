@@ -15,7 +15,11 @@ def instant_huesli(curve, giebelhoehe, flip, giebelposition, dachwinkel, bake):
     segments, _ = gh.Explode(curve, False)
     longest_segment = max(segments, key=lambda seg: gh.Length(seg))
     start, end = gh.EndPoints(longest_segment)
-    vector, _ = gh.Rotate(gh.Vector2Pt(start, end, False), angle, gh.XYPlane(gh.ConstructPoint(0.0, 0.0, 0.0)))
+    vector, _ = gh.Rotate(
+        gh.Vector2Pt(start, end, False),
+        angle,
+        gh.XYPlane(gh.ConstructPoint(0.0, 0.0, 0.0)),
+    )
     plane, _ = gh.AlignPlane(gh.XYPlane(gh.ConstructPoint(0.0, 0.0, 0.0)), vector)
     bbox, _ = gh.BoundingBox(solid, plane)
     diagonal = gh.Line(gh.BoxCorners(bbox)[4], gh.BoxCorners(bbox)[6])
@@ -26,7 +30,9 @@ def instant_huesli(curve, giebelhoehe, flip, giebelposition, dachwinkel, bake):
     dach_planes = [
         gh.Rotate3D(giebelplane, math.radians(90 - dachwinkel), giebelpunkt, vector)[0],
         gh.Mirror(
-            gh.Rotate3D(giebelplane, math.radians(90 - dachwinkel), giebelpunkt, vector)[0],
+            gh.Rotate3D(
+                giebelplane, math.radians(90 - dachwinkel), giebelpunkt, vector
+            )[0],
             giebelplane,
         )[0],
     ]
@@ -42,6 +48,8 @@ def instant_huesli(curve, giebelhoehe, flip, giebelposition, dachwinkel, bake):
         sc.doc = Rhino.RhinoDoc.ActiveDoc
         attributes = Rhino.DocObjects.ObjectAttributes()
         sc.doc.Objects.AddBrep(solid, attributes)
-        sc.doc = sc.sticky.get("ghdoc", None)  # Retrieve ghdoc from scriptcontext's sticky dictionary
+        sc.doc = sc.sticky.get(
+            "ghdoc", None
+        )  # Retrieve ghdoc from scriptcontext's sticky dictionary
 
     return solid
