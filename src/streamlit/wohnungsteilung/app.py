@@ -25,8 +25,10 @@ def wohnungsteilung(module_sizes, total_area, max_residual):
 
 st.title("🏠 Automatische Wohnungsaufteilung")
 
+st.text("Dieses Tool hilft beim Finden eines optimalen Wohnungsmixes für eine vorgegebene Geschossfläche.")
+
 modul_text = st.text_input(
-    "Modulgrößen (z. B. 30, 50, 70)", value="30, 50, 70"
+    "Erlaubte Modulgrößen (z. B. 30, 50, 70)", value="30, 50, 70"
 )
 
 total_area = st.number_input(
@@ -34,7 +36,7 @@ total_area = st.number_input(
 )
 
 max_residual = st.number_input(
-    "Maximal erlaubte Restfläche (m²)", min_value=0.0, value=5.0, step=1.0
+    "Maximal erlaubte Restfläche (m²)", min_value=0.0, value=10.0, step=1.0
 )
 
 if st.button("Berechnen"):
