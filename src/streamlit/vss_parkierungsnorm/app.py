@@ -18,6 +18,8 @@ def vss_parkierungsnorm(Gv, W, Pf, U, V):
     }
 
     fahrgasse = d_pf.get(W, {}).get(Pf, 0)
+    if not fahrgasse:
+        raise ValueError(f"Für Winkel {W}° und Parkfeldbreite {Pf} m ist kein Fahrgassenwert definiert.")
     if Gv and fahrgasse < 5.50:
         fahrgasse = 5.50
 
@@ -101,11 +103,28 @@ with st.form("params"):
     submit = st.form_submit_button("Berechnen")
 
 if submit:
-    Geo, info = vss_parkierungsnorm(Gv, W, Pf, U, V)
-    fig = plot_parking(Geo)
-    st.plotly_chart(fig, use_container_width=True)
-    st.markdown(f"**{info}**")
+    try:
+        Geo, info = vss_parkierungsnorm(Gv, W, Pf, U, V)
+        fig = plot_parking(Geo)
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown(f"**{info}**")
 
-    export_dxf(Geo, "parkierung.dxf")
-    with open("parkierung.dxf", "rb") as f:
-        st.download_button("Download DXF", f, file_name="parkierung.dxf")
+        export_dxf(Geo, "parkierung.dxf")
+        with open("parkierung.dxf", "rb") as f:
+            st.download_button("Download DXF", f, file_name="parkierung.dxf")
+    except ValueError as e:
+        st.error(str(e))
+        d_pf = {
+            90: [2.50, 2.55, 2.60, 2.65, 2.70, 2.75, 2.80],
+            75: [2.50, 2.65],
+            70: [2.50, 2.70],
+            60: [2.50, 2.80],
+            45: [2.50],
+            30: [2.50],
+        }
+        mögliche_breiten = d_pf.get(W, [])
+        if mögliche_breiten:
+            st.markdown(f"Mögliche Parkfeldbreiten für Winkel **{W}°**: {', '.join(f'{w:.2f} m' for w in mögliche_breiten)}")
+        else:
+            st.warning("Keine definierten Werte für diesen Winkel.")
+

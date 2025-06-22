@@ -9,6 +9,7 @@ from .instant_huesli import instant_huesli
 from .wohnungsteilung import wohnungsteilung
 from .gekritzel_aus_punkten import gekritzel_aus_punkten
 from .apply_box_mapping import apply_box_mapping
+from. point_two_closest_points import point_two_closest_points
 
 
 __autohor__ = "Jonas Haldemann"
@@ -29,4 +30,5 @@ __all__ = [
     "wohnungsteilung",
     "apply_box_mapping",
     "gekritzel_aus_punkten",
+    "point_two_closest_points",
 ]
