@@ -48,27 +48,31 @@ st.title("🛣️ VSS-Rampe im Schnitt")
 
 st.sidebar.header("Parameter")
 h = st.sidebar.number_input("Geschosshöhe [m]", min_value=0.1, max_value=6.0, value=3.2, step=0.1)
-g = st.sidebar.number_input("Gefälle [%]", min_value=1.0, max_value=18.0, value=12.0, step=0.5)
+g = st.sidebar.selectbox("Gefälle [%]", options=[15.0, 18.0], index=0)
 
 rampe, laenge = vss_rampe_im_schnitt(h, g)
 
-# Plotly Zeichnung
-fig = go.Figure()
-x, y = rampe.xy
-fig.add_trace(go.Scatter(x=x, y=y, mode="lines+markers", name="Rampe"))
-fig.update_layout(
-    title="Rampe im Schnitt (2D)",
-    xaxis_title="X [m]",
-    yaxis_title="Y [m]",
-    width=800,
-    height=400,
-    yaxis_scaleanchor="x",
-    template="simple_white"
-)
-st.plotly_chart(fig)
+# Plotly Zeichnung – sicherstellen, dass rampe korrekt ist
+if rampe and len(rampe.coords) >= 2:
+    x, y = rampe.xy
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=y, mode="lines+markers", name="Rampe"))
+    fig.update_layout(
+        title="Rampe im Schnitt (2D)",
+        xaxis_title="X [m]",
+        yaxis_title="Y [m]",
+        width=800,
+        height=400,
+        yaxis_scaleanchor="x",
+        template="simple_white"
+    )
+    st.plotly_chart(fig)
+    st.markdown(f"**Horizontale Rampenlänge:** {laenge:.2f} m")
 
-st.markdown(f"**Horizontale Rampenlänge:** {laenge:.2f} m")
+    # DXF Export
+    dxf_data = export_dxf(rampe)
+    st.download_button("📥 DXF herunterladen", dxf_data, file_name="rampe.dxf", mime="application/dxf")
 
-# DXF Export
-dxf_data = export_dxf(rampe)
-st.download_button("📥 DXF herunterladen", dxf_data, file_name="rampe.dxf", mime="application/dxf")
+else:
+    st.error("Die Geometrie konnte nicht berechnet werden. Bitte überprüfe die Eingaben.")
+
