@@ -54,7 +54,9 @@ rampe, laenge = vss_rampe_im_schnitt(h, g)
 
 # Prüfung: Ist rampe ein gültiger LineString mit mind. 2 Punkten?
 if isinstance(rampe, LineString) and len(rampe.coords) >= 2:
-    x, y = rampe.xy
+    coords = rampe.xy
+    x = list(coords[0])
+    y = list(coords[1])
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, y=y, mode="lines+markers", name="Rampe"))
     fig.update_layout(
