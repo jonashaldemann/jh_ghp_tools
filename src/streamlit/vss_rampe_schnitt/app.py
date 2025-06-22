@@ -52,8 +52,8 @@ g = st.sidebar.selectbox("Gefälle [%]", options=[15.0, 18.0], index=0)
 
 rampe, laenge = vss_rampe_im_schnitt(h, g)
 
-# Plotly Zeichnung – sicherstellen, dass rampe korrekt ist
-if rampe and len(rampe.coords) >= 2:
+# Prüfung: Ist rampe ein gültiger LineString mit mind. 2 Punkten?
+if isinstance(rampe, LineString) and len(rampe.coords) >= 2:
     x, y = rampe.xy
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, y=y, mode="lines+markers", name="Rampe"))
@@ -72,7 +72,7 @@ if rampe and len(rampe.coords) >= 2:
     # DXF Export
     dxf_data = export_dxf(rampe)
     st.download_button("📥 DXF herunterladen", dxf_data, file_name="rampe.dxf", mime="application/dxf")
-
 else:
-    st.error("Die Geometrie konnte nicht berechnet werden. Bitte überprüfe die Eingaben.")
+    st.error("Fehler beim Erzeugen der Rampe. Ungültige Geometrie.")
+
 
