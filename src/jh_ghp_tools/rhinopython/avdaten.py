@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import rhinoscriptsyntax as rs
+import json
+import os
+import codecs
 
 # Schritt 1: Alle Blockinstanzen explodieren und Layer der Inhalte anpassen
 def explode_blocks_and_move_to_instance_layer():
@@ -37,72 +40,15 @@ def reassign_layers_and_cleanup(layer_map):
             if not objs:
                 rs.DeleteLayer(source_layer)
 
+def load_layer_map(filename="avdatenlayer.json"):
+    script_dir = os.path.dirname(__file__)
+    filepath = os.path.join(script_dir, filename)
+
+    with codecs.open(filepath, "r", "utf-8") as f:
+        return json.load(f)
+
 # Dein Mapping-Dictionary (hier abgekürzt – ersetze ggf. durch das Original)
-layer_map = {
-    "01129": "000 Kataster Text",
-    "01122": "000 Kataster Fixpunkte",
-    "01139": "000 Kataster Fixpunkte",
-    "01131": "000 Kataster Fixpunkte",
-    "01132": "000 Kataster Fixpunkte",
-    "01212": "000 Kataster Gebäude",
-    "01211": "000 Kataster Gebäude",
-    "01234": "000 Kataster Grünflächen",
-    "01225": "000 Kataster Hartflächen",
-    "01231": "000 Kataster Landwirtschaft",
-    "01221": "000 Kataster Strassen",
-    "01252": "000 Kataster Grünflächen",
-    "01226": "000 Kataster Strassen",
-    "01236": "000 Kataster Grünflächen",
-    "01227": "000 Kataster Strassen",
-    "01241": "000 Kataster Gewässer",
-    "01242": "000 Kataster Grünflächen",
-    "01251": "000 Kataster Wald",
-    "01233": "000 Kataster Grünflächen",
-    "01224": "000 Kataster Gewässer",
-    "01264": "000 Kataster Hartflächen",
-    "01222": "000 Kataster Eisenbahn",
-    "01219": "000 Kataster Text",
-    "01229": "000 Kataster Text",
-    "01249": "000 Kataster Text",
-    "01243": "000 Kataster Gewässer",
-    "01313": "000 Kataster Objekte",
-    "01321": "000 Kataster Unterirdisch",
-    "01323": "000 Kataster Dächer",
-    "01315": "000 Kataster Objekte",
-    "01316": "000 Kataster Objekte",
-    "01312": "000 Kataster Objekte",
-    "01324": "000 Kataster Objekte",
-    "01314": "000 Kataster Objekte",
-    "01341": "000 Kataster Unterirdisch",
-    "01351": "000 Kataster Objekte",
-    "01322": "000 Kataster Unterirdisch",
-    "01342": "000 Kataster Objekte",
-    "01311": "000 Kataster Gebäudeteil",
-    "01317": "000 Kataster Objekte",
-    "01331": "000 Kataster Objekte",
-    "01343": "000 Kataster Objekte",
-    "01334": "000 Kataster Objekte",
-    "01364": "000 Kataster Objekte",
-    "01369": "000 Kataster Text",
-    "01329": "000 Kataster Text",
-    "01519": "000 Kataster Text",
-    "01529": "000 Kataster Text",
-    "01539": "000 Kataster Text",
-    "01653": "000 Kataster Parzelle Punkte",
-    "01651": "000 Kataster Parzelle Punkte",
-    "01654": "000 Kataster Parzelle Punkte",
-    "01657": "000 Kataster Parzelle Punkte",
-    "01652": "000 Kataster Parzelle Punkte",
-    "01656": "000 Kataster Parzelle Punkte",
-    "01659": "000 Kataster Text Fixpunkte",
-    "01629": "000 Kataster Text",
-    "01621": "000 Kataster Parzelle",
-    "01619": "000 Kataster Text",
-    "01639": "000 Kataster Text",
-    "01611": "000 Kataster Parzelle",
-    "01631": "000 Kataster Parzelle",
-    "01299": "000 Kataster Text"
-}
+layer_map = load_layer_map()
 
 # Ausführen
 explode_blocks_and_move_to_instance_layer()
