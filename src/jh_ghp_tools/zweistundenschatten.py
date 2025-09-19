@@ -3,7 +3,7 @@ import System
 import ghpythonlib.components as gh
 
 
-def zweistundenschatten(B, day, month, start, end):
+def zweistundenschatten(B, day=29, month=10, start=8, end=17, step=None, delta=None):
     """
     Berechnet den Schatten eines Objektes B in einem Zeitraum von 2 Stunden.
 
@@ -15,10 +15,10 @@ def zweistundenschatten(B, day, month, start, end):
     Returns:
         schatten: Die berechneten Schattenflächen.
     """
-
-    # Main Settings
-    step = 1
-    stunden = 2
+    if step is None:
+        step = 1
+    if delta is None:
+        delta = 2
 
     # Rothrist, MEZ UTC+1
     sun = Rhino.RhinoDoc.ActiveDoc.RenderSettings.Sun
@@ -46,9 +46,9 @@ def zweistundenschatten(B, day, month, start, end):
     # Find intersection points of shadows
     match_points = [
         pt
-        for i in range(len(regions) - stunden)
-        if regions[i] and regions[i + stunden]
-        for pt in gh.MultipleCurves([regions[i], regions[i + stunden]])[0]
+        for i in range(len(regions) - delta)
+        if regions[i] and regions[i + delta]
+        for pt in gh.MultipleCurves([regions[i], regions[i + delta]])[0]
     ]
 
     # Filter points outside the footprint
@@ -61,7 +61,7 @@ def zweistundenschatten(B, day, month, start, end):
     split_crv = gh.PolyLine(match_points_outer, False)
     brep_centroid = gh.Volume(B)[1]
     surfaces = []
-    for srf in regions[stunden:-stunden]:
+    for srf in regions[delta:-delta]:
         split = gh.SurfaceSplit(srf, split_crv)
         split_centroids = gh.Area(split)[1]
         distances = gh.Distance(split_centroids, brep_centroid)
