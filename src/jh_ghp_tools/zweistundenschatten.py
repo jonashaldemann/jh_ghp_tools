@@ -3,7 +3,7 @@ import System
 import ghpythonlib.components as gh
 
 
-def zweistundenschatten(B, start, end):
+def zweistundenschatten(B, day, month, start, end):
     """
     Berechnet den Schatten eines Objektes B in einem Zeitraum von 2 Stunden.
 
@@ -35,7 +35,7 @@ def zweistundenschatten(B, start, end):
     for t in stundenserie:
         h, m = divmod(int(t * 60), 60)
         datetime = System.DateTime(
-            2025, 10, 29, h, m, 0, System.DateTimeKind.Unspecified
+            2025, month, day, h, m, 0, System.DateTimeKind.Unspecified
         )
         sun.SetDateTime(datetime, datetime.Kind)
         vec = sun.Vector
