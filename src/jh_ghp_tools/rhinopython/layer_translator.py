@@ -2,15 +2,18 @@
 import rhinoscriptsyntax as rs
 import json
 import os
-import codecs
 
 # -------------------------------
 # Schritt 0: Layer Mapping laden
 # -------------------------------
-def load_layer_map(filename="avdatenlayer.json"):
-    script_dir = os.path.dirname(__file__)
-    filepath = os.path.join(script_dir, filename)
-    with codecs.open(filepath, "r", "utf-8") as f:
+def load_layer_map():
+    file_path = rs.OpenFileName(
+        "Layer-Mapping-Datei auswählen",
+        "JSON files (*.json)|*.json|All files (*.*)|*.*||"
+    )
+    if not file_path:
+        raise FileNotFoundError("Keine Datei ausgewählt.")
+    with open(file_path, "r") as f:
         return json.load(f)
 
 layer_map = load_layer_map()
@@ -23,9 +26,7 @@ def explode_blocks():
     if not block_instances:
         return
     for instance in block_instances:
-        exploded = rs.ExplodeBlockInstance(instance)
-        # nichts weiter tun, reassign_layers() erledigt den Layer-Wechsel
-
+        rs.ExplodeBlockInstance(instance)
 
 # -------------------------------
 # Schritt 2: Objekte anhand Mapping verschieben
@@ -36,7 +37,7 @@ def reassign_layers(layer_map):
             continue
         if not rs.IsLayer(target_layer):
             rs.AddLayer(target_layer)
-        objs = rs.ObjectsByLayer(source_layer, True)  # inkl. versteckte/gesperrte
+        objs = rs.ObjectsByLayer(source_layer, True)
         if objs:
             for obj in objs:
                 rs.ObjectLayer(obj, target_layer)
@@ -47,11 +48,9 @@ def reassign_layers(layer_map):
 def delete_layer_recursive(layer):
     if not rs.IsLayer(layer):
         return
-    # Unterlayer zuerst löschen
     sublayers = rs.LayerChildren(layer) or []
     for sub in sublayers:
         delete_layer_recursive(sub)
-    # Prüfen ob noch Objekte drauf liegen
     objs = rs.ObjectsByLayer(layer, True)
     if objs:
         print("Layer", layer, "hat noch", len(objs), "Objekte, kann nicht gelöscht werden")
@@ -67,7 +66,7 @@ def cleanup_layers(layer_map):
         delete_layer_recursive(source_layer)
 
 # -------------------------------
-# Optional: Blockdefinitionen löschen (wenn nicht mehr benötigt)
+# Optional: Blockdefinitionen löschen
 # -------------------------------
 def delete_all_block_definitions():
     for block in rs.BlockNames():
@@ -77,7 +76,7 @@ def delete_all_block_definitions():
             print("Konnte Blockdefinition nicht löschen:", block, e)
 
 # -------------------------------
-# Optional: Alle leeren Layer im Dokument löschen
+# Optional: Alle leeren Layer löschen
 # -------------------------------
 def cleanup_all_empty_layers():
     for layer in rs.LayerNames():
@@ -92,4 +91,4 @@ explode_blocks()
 reassign_layers(layer_map)
 cleanup_layers(layer_map)
 cleanup_all_empty_layers()
-# delete_all_block_definitions()  # optional aktivieren, wenn Blöcke komplett entfernt werden sollen
+# delete_all_block_definitions()  # optional aktivieren
