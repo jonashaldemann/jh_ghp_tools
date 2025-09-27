@@ -1,11 +1,13 @@
 import Rhino.Geometry as rg
 
+
 def baeume_staffelung(curves, max_loops=50, tol=0.001):
     """
     Iterative Kurven-Überlappungsreduktion.
     Kleine Kurven zuerst, Überschneidungen werden abgezogen.
     Ergebnis: geschlossene Kurven.
     """
+
     # Hilfsfunktion: sichere Fläche einer Kurve
     def curve_area_safe(crv):
         amp = rg.AreaMassProperties.Compute(crv)
@@ -30,7 +32,11 @@ def baeume_staffelung(curves, max_loops=50, tol=0.001):
                 diff = rg.Curve.CreateBooleanDifference(sample_copy, c, tol)
                 if diff:
                     # Nehme das größte verbleibende Segment
-                    diff = [crv for crv in diff if crv and crv.IsClosed and curve_area_safe(crv) > tol]
+                    diff = [
+                        crv
+                        for crv in diff
+                        if crv and crv.IsClosed and curve_area_safe(crv) > tol
+                    ]
                     if diff:
                         diff = sorted(diff, key=curve_area_safe, reverse=True)
                         sample_copy = diff[0]

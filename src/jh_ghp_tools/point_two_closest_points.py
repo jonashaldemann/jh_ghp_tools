@@ -1,7 +1,8 @@
 import Rhino.Geometry as rg
 
+
 def point_two_closest_points(points):
-  
+
     lines = []
     for i, pt in enumerate(points):
         # Calculate distances to all other points
@@ -11,8 +12,7 @@ def point_two_closest_points(points):
         for idx, _ in closest:
             line = rg.Line(pt, points[idx])
             lines.append(line)
-    
-    
+
     # Join lines that are contiguous
     joined_curves = rg.Curve.JoinCurves([rg.LineCurve(line) for line in lines])
 

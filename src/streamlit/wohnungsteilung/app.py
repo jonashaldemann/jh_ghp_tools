@@ -25,7 +25,9 @@ def wohnungsteilung(module_sizes, total_area, max_residual):
 
 st.title("🏠 Automatische Wohnungsaufteilung")
 
-st.text("Dieses Tool hilft beim Finden eines optimalen Wohnungsmixes für eine vorgegebene Geschossfläche.")
+st.text(
+    "Dieses Tool hilft beim Finden eines optimalen Wohnungsmixes für eine vorgegebene Geschossfläche."
+)
 
 modul_text = st.text_input(
     "Erlaubte Modulgrößen (z. B. 50, 66, 91, 113)", value="50, 66, 91, 113"
@@ -43,7 +45,9 @@ if st.button("Berechnen"):
     try:
         module_sizes = [float(x.strip()) for x in modul_text.split(",")]
     except ValueError:
-        st.error("Bitte gültige Zahlen für Modulgrößen eingeben (z. B. 50, 66, 91, 113)")
+        st.error(
+            "Bitte gültige Zahlen für Modulgrößen eingeben (z. B. 50, 66, 91, 113)"
+        )
     else:
         results = wohnungsteilung(module_sizes, total_area, max_residual)
 
@@ -57,4 +61,6 @@ if st.button("Berechnen"):
                     for n, size in zip(combo, module_sizes)
                     if n > 0
                 ]
-                st.markdown(f"- {' + '.join(module_list)} → **Rest: {int(residual)} m²**")
+                st.markdown(
+                    f"- {' + '.join(module_list)} → **Rest: {int(residual)} m²**"
+                )

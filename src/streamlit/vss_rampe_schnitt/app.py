@@ -5,6 +5,7 @@ from shapely.geometry import LineString
 import ezdxf
 from io import BytesIO
 
+
 def vss_rampe_im_schnitt(geschosshoehe, gefaelle):
     """
     Berechnet Rampe im 2D-Schnitt gemäss VSS mit einfacher Rundung.
@@ -30,6 +31,7 @@ def vss_rampe_im_schnitt(geschosshoehe, gefaelle):
     laenge = p4[0] - p1[0]
     return rampe, laenge
 
+
 def export_dxf(linestring):
     doc = ezdxf.new()
     msp = doc.modelspace()
@@ -42,12 +44,15 @@ def export_dxf(linestring):
     buffer.seek(0)
     return buffer
 
+
 # Streamlit UI
 st.set_page_config(page_title="VSS Rampe", layout="centered")
 st.title("🛣️ VSS-Rampe im Schnitt")
 
 st.sidebar.header("Parameter")
-h = st.sidebar.number_input("Geschosshöhe [m]", min_value=0.1, max_value=6.0, value=3.2, step=0.1)
+h = st.sidebar.number_input(
+    "Geschosshöhe [m]", min_value=0.1, max_value=6.0, value=3.2, step=0.1
+)
 g = st.sidebar.selectbox("Gefälle [%]", options=[15.0, 18.0], index=0)
 
 rampe, laenge = vss_rampe_im_schnitt(h, g)
@@ -66,15 +71,15 @@ if isinstance(rampe, LineString) and len(rampe.coords) >= 2:
         width=800,
         height=400,
         yaxis_scaleanchor="x",
-        template="simple_white"
+        template="simple_white",
     )
     st.plotly_chart(fig)
     st.markdown(f"**Horizontale Rampenlänge:** {laenge:.2f} m")
 
     # DXF Export
     dxf_data = export_dxf(rampe)
-    st.download_button("📥 DXF herunterladen", dxf_data, file_name="rampe.dxf", mime="application/dxf")
+    st.download_button(
+        "📥 DXF herunterladen", dxf_data, file_name="rampe.dxf", mime="application/dxf"
+    )
 else:
     st.error("Fehler beim Erzeugen der Rampe. Ungültige Geometrie.")
-
-

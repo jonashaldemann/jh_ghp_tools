@@ -1,15 +1,23 @@
-
 import math
 import streamlit as st
 import plotly.graph_objects as go
 import ezdxf
+
 
 def vss_parkierungsnorm(Gv, W, Pf, U, V):
     parkfeldlaenge = 5.00
     winkel_rad = math.radians(90 - W)
 
     d_pf = {
-        90: {2.50: 6.50, 2.55: 6.25, 2.60: 6.00, 2.65: 5.75, 2.70: 5.50, 2.75: 5.25, 2.80: 5.00,},
+        90: {
+            2.50: 6.50,
+            2.55: 6.25,
+            2.60: 6.00,
+            2.65: 5.75,
+            2.70: 5.50,
+            2.75: 5.25,
+            2.80: 5.00,
+        },
         75: {2.50: 5.00, 2.65: 4.50},
         70: {2.50: 4.50, 2.70: 4.00},
         60: {2.50: 3.50, 2.80: 3.20},
@@ -19,7 +27,9 @@ def vss_parkierungsnorm(Gv, W, Pf, U, V):
 
     fahrgasse = d_pf.get(W, {}).get(Pf, 0)
     if not fahrgasse:
-        raise ValueError(f"Für Winkel {W}° und Parkfeldbreite {Pf} m ist kein Fahrgassenwert definiert.")
+        raise ValueError(
+            f"Für Winkel {W}° und Parkfeldbreite {Pf} m ist kein Fahrgassenwert definiert."
+        )
     if Gv and fahrgasse < 5.50:
         fahrgasse = 5.50
 
@@ -64,13 +74,16 @@ def vss_parkierungsnorm(Gv, W, Pf, U, V):
     Info = f"Fahrgasse = {fahrgasse:.2f} m"
     return Geo, Info
 
+
 def plot_parking(Geo):
     fig = go.Figure()
     for poly in Geo:
         x, y = zip(*poly)
         x = list(x) + [x[0]]
         y = list(y) + [y[0]]
-        fig.add_trace(go.Scatter(x=x, y=y, fill="toself", mode="lines", line_color="blue"))
+        fig.add_trace(
+            go.Scatter(x=x, y=y, fill="toself", mode="lines", line_color="blue")
+        )
     fig.update_layout(
         width=700,
         height=500,
@@ -82,8 +95,10 @@ def plot_parking(Geo):
     )
     return fig
 
+
 def export_dxf(Geo, filename="parkierung.dxf"):
     import ezdxf
+
     doc = ezdxf.new()
     msp = doc.modelspace()
     for poly in Geo:
@@ -92,14 +107,23 @@ def export_dxf(Geo, filename="parkierung.dxf"):
         msp.add_lwpolyline(points, close=True)
     doc.saveas(filename)
 
+
 st.title("Parkierung nach VSS-Norm")
 
 with st.form("params"):
     Gv = st.checkbox("Gegenverkehr berücksichtigen", value=True)
-    W = st.selectbox("Winkel der Parkplätze (Grad)", options=[90, 75, 70, 60, 45, 30], index=0)
-    Pf = st.selectbox("Breite eines Parkfeldes (m)", options=[2.50, 2.55, 2.60, 2.65, 2.70, 2.75, 2.80], index=0)
+    W = st.selectbox(
+        "Winkel der Parkplätze (Grad)", options=[90, 75, 70, 60, 45, 30], index=0
+    )
+    Pf = st.selectbox(
+        "Breite eines Parkfeldes (m)",
+        options=[2.50, 2.55, 2.60, 2.65, 2.70, 2.75, 2.80],
+        index=0,
+    )
     U = st.number_input("Anzahl Parkreihen (U)", min_value=1, max_value=20, value=5)
-    V = st.number_input("Anzahl Parkplätze pro Reihe (V)", min_value=1, max_value=20, value=10)
+    V = st.number_input(
+        "Anzahl Parkplätze pro Reihe (V)", min_value=1, max_value=20, value=10
+    )
     submit = st.form_submit_button("Berechnen")
 
 if submit:
@@ -124,7 +148,8 @@ if submit:
         }
         mögliche_breiten = d_pf.get(W, [])
         if mögliche_breiten:
-            st.markdown(f"Mögliche Parkfeldbreiten für Winkel **{W}°**: {', '.join(f'{w:.2f} m' for w in mögliche_breiten)}")
+            st.markdown(
+                f"Mögliche Parkfeldbreiten für Winkel **{W}°**: {', '.join(f'{w:.2f} m' for w in mögliche_breiten)}"
+            )
         else:
             st.warning("Keine definierten Werte für diesen Winkel.")
-

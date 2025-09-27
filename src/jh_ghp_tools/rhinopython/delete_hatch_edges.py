@@ -4,12 +4,15 @@ import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import Rhino
 
+
 def sample_curve_points(curve, num=20):
     if not isinstance(curve, Rhino.Geometry.NurbsCurve):
         curve = curve.ToNurbsCurve()
-    if not curve: return []
+    if not curve:
+        return []
     t_vals = [curve.Domain.ParameterAt(i / float(num - 1)) for i in range(num)]
     return [curve.PointAt(t) for t in t_vals]
+
 
 def move_curves_if_fully_on_hatch_edge(tol=0.01, num_points=20):
     deleted_layer = "_deleted_"
@@ -18,7 +21,8 @@ def move_curves_if_fully_on_hatch_edge(tol=0.01, num_points=20):
 
     C = rs.GetObjects("Waehle Kurven (C)", rs.filter.curve)
     H = rs.GetObjects("Waehle Hatches (H)", rs.filter.hatch)
-    if not C or not H: return
+    if not C or not H:
+        return
 
     hatch_edges = []
     for hid in H:
@@ -34,7 +38,8 @@ def move_curves_if_fully_on_hatch_edge(tol=0.01, num_points=20):
     moved_ids = []
     for cid in C:
         c_obj = sc.doc.Objects.Find(cid)
-        if not c_obj: continue
+        if not c_obj:
+            continue
         c_geom = c_obj.Geometry
         points = sample_curve_points(c_geom, num_points)
 
@@ -61,5 +66,6 @@ def move_curves_if_fully_on_hatch_edge(tol=0.01, num_points=20):
                 break
 
     print("Verschoben:", len(moved_ids), "Kurven auf Layer", deleted_layer)
+
 
 move_curves_if_fully_on_hatch_edge()

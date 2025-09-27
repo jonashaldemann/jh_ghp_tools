@@ -9,11 +9,13 @@ from .instant_huesli import instant_huesli
 from .wohnungsteilung import wohnungsteilung
 from .gekritzel_aus_punkten import gekritzel_aus_punkten
 from .apply_box_mapping import apply_box_mapping
-from. point_two_closest_points import point_two_closest_points
-from. baeume_staffelung import baeume_staffelung
+from .point_two_closest_points import point_two_closest_points
+from .baeume_staffelung import baeume_staffelung
+from .bake_box_map import bake_box_map
+from .verlaufsschraffur import verlaufsschraffur
+from .random_lines_from_points import random_lines_from_points
 
-
-__autohor__ = "Jonas Haldemann"
+__author__ = "Jonas Haldemann"
 __copyright__ = "2025, Jonas Haldemann"
 __license__ = "MIT License"
 __version__ = "0.1.0"
@@ -32,5 +34,8 @@ __all__ = [
     "apply_box_mapping",
     "gekritzel_aus_punkten",
     "point_two_closest_points",
-    "baeume_staffelung"
+    "baeume_staffelung",
+    "bake_box_map",
+    "verlaufsschraffur",
+    "random_lines_from_points"
 ]
