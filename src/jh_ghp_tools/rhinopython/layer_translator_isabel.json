@@ -18,5 +18,7 @@
     "U-afLA-Text M200": "001 Situ Text",
     "U afLA-S-Veg Wiese": "001 Situ Gartenanlage",
     "U afLA-S-Veg Bepflanzung": "001 Situ Gartenanlage",
-    "U-afLA-Text Materialisierung" : "001 Situ Text"
+    "U-afLA-Text Materialisierung" : "001 Situ Text",
+    "U afLA-B200-L-Blaetter" : "001 Situ Baum",
+    "U afLA-B200-L-Stamm" : "001 Situ Baum"
 }
