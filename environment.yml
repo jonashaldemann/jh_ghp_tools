@@ -2,6 +2,7 @@ name: jh_ghp
 dependencies:
   - python==3.12
   - pip
+  - streamlit
   - pip:
     - compas_model
     - black
