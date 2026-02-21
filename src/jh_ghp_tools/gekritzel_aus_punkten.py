@@ -1,23 +1,25 @@
-import ghpythonlib.components as gh
-import Grasshopper.Kernel as gk
-from ghpythonlib.componentbase import executingcomponent as component
-
+import Rhino.Geometry as rg
 
 def gekritzel_aus_punkten(P):
-    # do the work here
-    C = None
+    if not P or len(P) < 2:
+        return None
 
-    # Initialisierung
-    P_null = P.pop(0)  # Erster Punkt und gleichzeitig aus der Liste entfernen
-    P_sorted = [P_null]  # Liste mit sortierten Punkten
+    # Ersten Punkt entnehmen
+    P_null = P.pop(0)
+    P_sorted = [P_null]
 
-    # Punkte nach Nähe sortieren
-    while P:  # Solange P nicht leer ist
-        cp, index, _ = gh.ClosestPoint(P_null, P)
-        P_sorted.append(cp)
-        P_null = P.pop(
-            index
-        )  # Nächsten Punkt entfernen und als neuen Referenzpunkt setzen
+    # Solange Punkte übrig sind
+    while P:
+        # Distanzen zum aktuellen Punkt berechnen
+        distances = [P_null.DistanceTo(p) for p in P]
+        # Index des nächsten Punkts finden
+        index = distances.index(min(distances))
+        # Nächsten Punkt holen
+        P_next = P.pop(index)
+        P_sorted.append(P_next)
+        # Referenzpunkt aktualisieren
+        P_null = P_next
 
-    C = gh.PolyLine(P_sorted, False)
+    # Polyline aus sortierten Punkten erzeugen
+    C = rg.Polyline(P_sorted)
     return C

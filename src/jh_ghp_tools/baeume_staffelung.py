@@ -1,7 +1,7 @@
 import Rhino.Geometry as rg
 
 
-def baeume_staffelung(curves, max_loops=50, tol=0.001):
+def baeume_staffelung(curves, max_loops=20, tol=0.001):
     """
     Iterative Kurven-Überlappungsreduktion.
     Kleine Kurven zuerst, Überschneidungen werden abgezogen.
