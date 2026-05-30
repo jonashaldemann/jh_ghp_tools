@@ -14,6 +14,8 @@ from .baeume_staffelung import baeume_staffelung
 from .bake_box_map import bake_box_map
 from .verlaufsschraffur import verlaufsschraffur
 from .random_lines_from_points import random_lines_from_points
+from .get_guid_object_name import get_guid_object_name
+from .gruppieren_nach_string import gruppieren_nach_string
 
 __author__ = "Jonas Haldemann"
 __copyright__ = "2025, Jonas Haldemann"
@@ -37,5 +39,7 @@ __all__ = [
     "baeume_staffelung",
     "bake_box_map",
     "verlaufsschraffur",
-    "random_lines_from_points"
+    "random_lines_from_points",
+    "get_guid_object_name",
+    "gruppieren_nach_string"
 ]

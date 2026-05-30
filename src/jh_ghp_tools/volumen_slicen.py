@@ -2,59 +2,76 @@ import ghpythonlib.components as gh
 import Rhino.Geometry as rg
 
 
-def volumen_slicen(breps, h_eg, h_og, h_tot):
-    """
-    Berechnet Volumen-Schnitte und extrudiert diese basierend auf Eingabe-Breps.
+import Rhino.Geometry as rg
 
-    Args:
-        breps (list): Eingabe-Breps.
-        h_eg (float): Höhe des Erdgeschosses.
-        h_og (float): Höhe eines Obergeschosses.
-        h_tot (float): Gesamthöhe.
 
-    Returns:
-        tuple: (Liste der neuen Breps, Gesamtfläche als String)
-    """
+import Rhino.Geometry as rg
+
+
+def volumen_slicen(breps, h_eg, h_og, top_on=True):
     schnitthoehe = 0.01
-    storeys = int(h_tot / 2.5)
 
-    # Ebenen für jede Etage erstellen
-    storey_base_heights = [schnitthoehe] + [
-        h_eg + schnitthoehe + h_og * i for i in range(storeys)
-    ]
-    planes = [
-        rg.Plane(rg.Point3d(0, 0, height), rg.Vector3d.ZAxis)
-        for height in storey_base_heights
-    ]
-    storeys = ["EG0"] + [f"OG{i}" for i in range(1, len(storey_base_heights) + 1)]
-
-    # Schnittkurven berechnen
-    x_curves = []
-    areas = []
+    all_curves = []
+    all_areas = []
     tabelle = []
-    for plane, storey in zip(planes, storeys):
-        storey_curves = []
-        for brep in breps:
+
+    for idx, brep in enumerate(breps):
+
+        bbox = brep.GetBoundingBox(True)
+        z0 = bbox.Min.Z
+        z_max = bbox.Max.Z
+
+        # Geschosse innerhalb der Bounding Box erzeugen
+        storey_heights = [z0 + schnitthoehe]
+
+        current_height = z0 + h_eg + schnitthoehe
+
+        while current_height < z_max:
+            storey_heights.append(current_height)
+            current_height += h_og
+
+        # Oberstes Geschoss optional entfernen
+        if not top_on and len(storey_heights) > 1:
+            storey_heights = storey_heights[:-1]
+
+        planes = [
+            rg.Plane(rg.Point3d(0, 0, height), rg.Vector3d.ZAxis)
+            for height in storey_heights
+        ]
+
+        storey_names = ["EG"] + [
+            f"OG{i}" for i in range(1, len(storey_heights))
+        ]
+
+        brep_areas = []
+
+        for plane, storey_name in zip(planes, storey_names):
+
             curves = rg.Brep.CreateContourCurves(brep, plane)
-            if curves:
-                storey_curves.extend(curves)
 
-        storey_area = []
-        for storey_curve in storey_curves:
-            area_props = rg.AreaMassProperties.Compute(storey_curve)
-            if area_props:
-                storey_area.append(area_props.Area)
+            if not curves:
+                brep_areas.append(0.0)
+                continue
 
-        storey_area = sum(storey_area)
-        areas.append(storey_area)
+            area_sum = 0.0
 
-        if storey_area > 0:
-            tabelle.append(f"{storey} {int(storey_area)} m²")
+            for curve in curves:
+                props = rg.AreaMassProperties.Compute(curve)
+                if props:
+                    area_sum += props.Area
 
-        if storey_curves:
-            x_curves.extend(storey_curves)
+            brep_areas.append(area_sum)
 
-    total_area = sum(areas)
+            if area_sum > 0:
+                tabelle.append(
+                    f"Brep{idx} {storey_name} {int(area_sum)} m²"
+                )
+
+            all_curves.extend(curves)
+
+        all_areas.append(sum(brep_areas))
+
+    total_area = sum(all_areas)
     total_area_str = f"ist {round(total_area)} m²"
 
-    return x_curves, total_area_str, tabelle
+    return all_curves, total_area_str, tabelle
