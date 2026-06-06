@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 import rhinoscriptsyntax as rs
 import json
-import os
+import unicodedata
+import io
+
+
+# -------------------------------
+# Hilfsfunktion: Unicode Normalisierung
+# -------------------------------
+def norm(s):
+    if not s:
+        return s
+    return unicodedata.normalize("NFC", s)
 
 
 # -------------------------------
@@ -14,8 +24,15 @@ def load_layer_map():
     )
     if not file_path:
         raise FileNotFoundError("Keine Datei ausgewählt.")
-    with open(file_path, "r") as f:
-        return json.load(f)
+
+    with io.open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Keys und Values normalisieren
+    return {
+        norm(k): norm(v)
+        for k, v in data.items()
+    }
 
 
 layer_map = load_layer_map()
@@ -26,10 +43,13 @@ layer_map = load_layer_map()
 # -------------------------------
 def explode_blocks():
     block_instances = [
-        obj for obj in rs.AllObjects() if rs.ObjectType(obj) == rs.filter.instance
+        obj for obj in rs.AllObjects()
+        if rs.ObjectType(obj) == rs.filter.instance
     ]
+
     if not block_instances:
         return
+
     for instance in block_instances:
         rs.ExplodeBlockInstance(instance)
 
@@ -39,11 +59,18 @@ def explode_blocks():
 # -------------------------------
 def reassign_layers(layer_map):
     for source_layer, target_layer in layer_map.items():
+
+        source_layer = norm(source_layer)
+        target_layer = norm(target_layer)
+
         if not rs.IsLayer(source_layer):
             continue
+
         if not rs.IsLayer(target_layer):
             rs.AddLayer(target_layer)
+
         objs = rs.ObjectsByLayer(source_layer, True)
+
         if objs:
             for obj in objs:
                 rs.ObjectLayer(obj, target_layer)
@@ -53,20 +80,24 @@ def reassign_layers(layer_map):
 # Schritt 3: Leere Layer rekursiv löschen
 # -------------------------------
 def delete_layer_recursive(layer):
+    layer = norm(layer)
+
     if not rs.IsLayer(layer):
         return
+
     sublayers = rs.LayerChildren(layer) or []
+
     for sub in sublayers:
         delete_layer_recursive(sub)
+
     objs = rs.ObjectsByLayer(layer, True)
+
     if objs:
-        print(
-            "Layer", layer, "hat noch", len(objs), "Objekte, kann nicht gelöscht werden"
-        )
+        print("Layer", layer, "hat noch", len(objs), "Objekte")
         return
+
     try:
         rs.DeleteLayer(layer)
-        print("Layer gelöscht:", layer)
     except Exception as e:
         print("Fehler beim Löschen von", layer, ":", e)
 
@@ -77,6 +108,19 @@ def cleanup_layers(layer_map):
 
 
 # -------------------------------
+# Optional: Alle leeren Layer löschen
+# -------------------------------
+def cleanup_all_empty_layers():
+    for layer in rs.LayerNames():
+        layer = norm(layer)
+
+        objs = rs.ObjectsByLayer(layer, True)
+
+        if not objs:
+            delete_layer_recursive(layer)
+
+
+# -------------------------------
 # Optional: Blockdefinitionen löschen
 # -------------------------------
 def delete_all_block_definitions():
@@ -84,24 +128,14 @@ def delete_all_block_definitions():
         try:
             rs.DeleteBlock(block)
         except Exception as e:
-            print("Konnte Blockdefinition nicht löschen:", block, e)
+            print("Block konnte nicht gelöscht werden:", block, e)
 
 
 # -------------------------------
-# Optional: Alle leeren Layer löschen
-# -------------------------------
-def cleanup_all_empty_layers():
-    for layer in rs.LayerNames():
-        objs = rs.ObjectsByLayer(layer, True)
-        if not objs:
-            delete_layer_recursive(layer)
-
-
-# -------------------------------
-# Hauptskript ausführen
+# Hauptskript
 # -------------------------------
 explode_blocks()
 reassign_layers(layer_map)
 cleanup_layers(layer_map)
 cleanup_all_empty_layers()
-# delete_all_block_definitions()  # optional aktivieren
+# delete_all_block_definitions()
