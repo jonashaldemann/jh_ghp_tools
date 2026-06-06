@@ -90,6 +90,7 @@ if st.button("Berechnen"):
             st.success(f"{len(results)} Kombination(en) gefunden:")
 
             for combo, residual in results[:10]:
+                mix_dev = mix_distance(combo, mix_target)
                 total_units = sum(combo)
 
                 module_list = [
@@ -100,5 +101,5 @@ if st.button("Berechnen"):
 
                 st.markdown(
                     f"- {' + '.join(module_list)} "
-                    f"→ Rest: {int(residual)} m²"
+                    f"→ Mix-Abweichung: {mix_dev:.4f} | Rest: {int(residual)} m²"
                 )
