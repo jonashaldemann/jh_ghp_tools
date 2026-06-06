@@ -27,11 +27,14 @@ def mix_distance(combo, target_mix):
     if total_units == 0:
         return float("inf")
 
-    actual_mix = [n / total_units for n in combo]
+    actual = [n / total_units for n in combo]
+
+    # target_mix ist in Prozent → in Anteile umwandeln
+    target_sum = sum(target_mix)
+    target = [t / target_sum for t in target_mix]
 
     return sum(
-        abs(a - t)
-        for a, t in zip(actual_mix, target_mix)
+        abs(a - t) for a, t in zip(actual, target)
     )
 
 
