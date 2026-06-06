@@ -44,13 +44,13 @@ st.text(
 )
 
 modul_text = st.text_input(
-    "Erlaubte Modulgrößen (z. B. 50, 66, 91, 113)",
-    value="50, 66, 91, 113"
+    "Erlaubte Modulgrößen (z. B. 62, 85, 108, 136)",
+    value="62, 85, 108, 136"
 )
 
 mix_text = st.text_input(
-    "Ziel-Wohnungsmix in % (z. B. 20, 20, 30, 30)",
-    value="25, 25, 25, 25"
+    "Ziel-Wohnungsmix in % (z. B. 25, 25, 25, 25)",
+    value="20, 20, 30, 30"
 )
 
 total_area = st.number_input(
