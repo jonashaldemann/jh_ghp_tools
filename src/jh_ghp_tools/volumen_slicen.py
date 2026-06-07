@@ -1,5 +1,7 @@
 import ghpythonlib.components as gh
 import Rhino.Geometry as rg
+from .get_guid_object_name import get_guid_object_name
+
 
 
 import Rhino.Geometry as rg
@@ -8,14 +10,35 @@ import Rhino.Geometry as rg
 import Rhino.Geometry as rg
 
 
-def volumen_slicen(breps, h_eg, h_og, top_on=True):
+def volumen_slicen(breps, guids, h_eg, h_og, top_on=True):
     schnitthoehe = 0.01
 
     all_curves = []
     all_areas = []
     tabelle = []
 
+    names = get_guid_object_name(guids)
+
     for idx, brep in enumerate(breps):
+        name = names[idx] if idx < len(names) else None
+
+        if not name:
+            continue
+        
+        use_global_heights = (h_eg is not None and h_og is not None)
+
+        if use_global_heights:
+                   
+            h_eg_local = h_eg
+            h_og_local = h_og
+
+        else:
+            
+            try:
+                h_eg_local, h_og_local = [float(x.strip()) for x in name.split("_")]
+            except:
+                continue
+
 
         bbox = brep.GetBoundingBox(True)
         z0 = bbox.Min.Z
@@ -24,11 +47,11 @@ def volumen_slicen(breps, h_eg, h_og, top_on=True):
         # Geschosse innerhalb der Bounding Box erzeugen
         storey_heights = [z0 + schnitthoehe]
 
-        current_height = z0 + h_eg + schnitthoehe
+        current_height = z0 + h_eg_local + schnitthoehe
 
         while current_height < z_max:
             storey_heights.append(current_height)
-            current_height += h_og
+            current_height += h_og_local
 
         # Oberstes Geschoss optional entfernen
         if not top_on and len(storey_heights) > 1:
