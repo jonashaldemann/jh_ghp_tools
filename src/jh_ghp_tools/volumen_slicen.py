@@ -6,9 +6,7 @@ from .get_guid_object_name import get_guid_object_name
 
 import Rhino.Geometry as rg
 
-
-import Rhino.Geometry as rg
-
+tol = 1e-6
 
 def volumen_slicen(breps, guids, h_eg, h_og, top_on=True):
     schnitthoehe = 0.01
@@ -27,15 +25,33 @@ def volumen_slicen(breps, guids, h_eg, h_og, top_on=True):
         
         use_global_heights = (h_eg is not None and h_og is not None)
 
+        brep_name = f"Brep{idx}"
+
         if use_global_heights:
                    
             h_eg_local = h_eg
             h_og_local = h_og
 
         else:
-            
+
             try:
-                h_eg_local, h_og_local = [float(x.strip()) for x in name.split("_")]
+                parts = [p.strip() for p in name.split("_")]
+
+                # Optionaler Name am Anfang (z.B. "EG_4_2.75")
+                try:
+                    float(parts[0])
+                except ValueError:
+                    brep_name = parts[0]
+                    parts = parts[1:]
+
+                heights = [float(p) for p in parts]
+
+                if len(heights) == 1:
+                    h_eg_local = heights[0]
+                    h_og_local = heights[0]
+                else:
+                    h_eg_local, h_og_local = heights[:2]
+
             except:
                 continue
 
@@ -49,7 +65,7 @@ def volumen_slicen(breps, guids, h_eg, h_og, top_on=True):
 
         current_height = z0 + h_eg_local + schnitthoehe
 
-        while current_height < z_max:
+        while current_height - schnitthoehe < z_max + tol:
             storey_heights.append(current_height)
             current_height += h_og_local
 
@@ -87,7 +103,7 @@ def volumen_slicen(breps, guids, h_eg, h_og, top_on=True):
 
             if area_sum > 0:
                 tabelle.append(
-                    f"Brep{idx} {storey_name} {int(area_sum)} m²"
+                    f"{brep_name} {storey_name} {int(area_sum)} m²"
                 )
 
             all_curves.extend(curves)

@@ -6,7 +6,7 @@ def wohnungsteilung(module_sizes, total_area, max_residual):
     """
     Gibt eine Liste möglicher Wohnungsaufteilungen mit Restfläche zurück.
     """
-    max_units_per_module = 10
+    max_units_per_module = int(total_area / min(module_sizes)) + 1
     ranges = [range(0, max_units_per_module + 1) for _ in module_sizes]
 
     results = []
