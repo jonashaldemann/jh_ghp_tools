@@ -2,12 +2,24 @@ import streamlit as st
 import itertools
 
 
+# --- Grundeinstellungen ---
+
+DEFAULT_MODULES = "62, 85, 108, 136"
+DEFAULT_MIX = "20, 20, 30, 30"
+
+DEFAULT_TOTAL_AREA = 288.0
+DEFAULT_MAX_RESIDUAL = 10.0
+
+DEFAULT_MAX_RESULTS = 30
+
+MAX_UNITS_PER_MODULE = 20
+
+
 def wohnungsteilung(module_sizes, total_area, max_residual):
     """
     Gibt eine Liste möglicher Wohnungsaufteilungen mit Restfläche zurück.
     """
-    max_units_per_module = 20
-    ranges = [range(0, max_units_per_module + 1) for _ in module_sizes]
+    ranges = [range(0, MAX_UNITS_PER_MODULE + 1) for _ in module_sizes]
 
     results = []
 
@@ -50,12 +62,12 @@ st.text(
 
 modul_text = st.text_input(
     "Erlaubte Modulgrößen (z. B. 62, 85, 108, 136)",
-    value="62, 85, 108, 136"
+    value=DEFAULT_MODULES
 )
 
 mix_text = st.text_input(
     "Ziel-Wohnungsmix in % (z. B. 25, 25, 25, 25)",
-    value="20, 20, 30, 30"
+    value=DEFAULT_MIX
 )
 
 use_mix = st.checkbox(
@@ -66,14 +78,14 @@ use_mix = st.checkbox(
 total_area = st.number_input(
     "Gesamtfläche des Geschosses (m²)",
     min_value=10.0,
-    value=288.0,
+    value=DEFAULT_TOTAL_AREA,
     step=10.0
 )
 
 max_residual = st.number_input(
     "Maximal erlaubte Restfläche (m²)",
     min_value=0.0,
-    value=10.0,
+    value=DEFAULT_MAX_RESIDUAL,
     step=1.0
 )
 
@@ -104,7 +116,7 @@ if st.button("Berechnen"):
 
             st.success(f"{len(results)} Kombination(en) gefunden:")
 
-            anzahl = 10 if use_mix else 1
+            anzahl = DEFAULT_MAX_RESULTS
 
             for combo, residual in results[:anzahl]:
                 module_list = [
