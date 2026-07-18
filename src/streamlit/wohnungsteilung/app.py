@@ -58,6 +58,11 @@ mix_text = st.text_input(
     value="20, 20, 30, 30"
 )
 
+use_mix = st.checkbox(
+    "Wohnungsmix berücksichtigen",
+    value=True
+)
+
 total_area = st.number_input(
     "Gesamtfläche des Geschosses (m²)",
     min_value=10.0,
@@ -75,7 +80,9 @@ max_residual = st.number_input(
 if st.button("Berechnen"):
     try:
         module_sizes = [float(x.strip()) for x in modul_text.split(",")]
-        mix_target = [float(x.strip()) for x in mix_text.split(",")]
+
+        if use_mix:
+            mix_target = [float(x.strip()) for x in mix_text.split(",")]
     except ValueError:
         st.error("Ungültige Eingaben bei Modulgrößen oder Mix.")
     else:
@@ -85,26 +92,35 @@ if st.button("Berechnen"):
             st.warning("Keine passende Kombination gefunden.")
         else:
             # Sortierung: zuerst Mix-Abweichung, dann Restfläche
-            results.sort(
-                key=lambda x: (
-                    mix_distance(x[0], mix_target),
-                    x[1]
+            if use_mix:
+                results.sort(
+                    key=lambda x: (
+                        mix_distance(x[0], mix_target),
+                        x[1]
+                    )
                 )
-            )
+            else:
+                results.sort(key=lambda x: x[1])
 
             st.success(f"{len(results)} Kombination(en) gefunden:")
 
-            for combo, residual in results[:10]:
-                mix_dev = mix_distance(combo, mix_target)
-                total_units = sum(combo)
+            anzahl = 10 if use_mix else 1
 
+            for combo, residual in results[:anzahl]:
                 module_list = [
                     f"{n} × {int(size)} m²"
                     for n, size in zip(combo, module_sizes)
                     if n > 0
                 ]
 
-                st.markdown(
-                    f"- {' + '.join(module_list)} "
-                    f"→ Mix-Abweichung: {mix_dev:.4f} | Rest: {int(residual)} m²"
-                )
+                if use_mix:
+                    mix_dev = mix_distance(combo, mix_target)
+                    st.markdown(
+                        f"- {' + '.join(module_list)} "
+                        f"→ Mix-Abweichung: {mix_dev:.4f} | Rest: {int(residual)} m²"
+                    )
+                else:
+                    st.markdown(
+                        f"- {' + '.join(module_list)} "
+                        f"→ Rest: {int(residual)} m²"
+                    )
