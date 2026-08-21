@@ -16,6 +16,7 @@ from .verlaufsschraffur import verlaufsschraffur
 from .random_lines_from_points import random_lines_from_points
 from .get_guid_object_name import get_guid_object_name
 from .gruppieren_nach_string import gruppieren_nach_string
+from .verlaufsschrafur_kurve_kurve import verlaufsschraffur_kurve_kurve
 
 __author__ = "Jonas Haldemann"
 __copyright__ = "2025, Jonas Haldemann"
@@ -41,5 +42,6 @@ __all__ = [
     "verlaufsschraffur",
     "random_lines_from_points",
     "get_guid_object_name",
-    "gruppieren_nach_string"
+    "gruppieren_nach_string",
+    "verlaufsschrafur_kurve_kurve"
 ]
