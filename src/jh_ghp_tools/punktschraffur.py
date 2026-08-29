@@ -1,8 +1,10 @@
 """
-verlaufsschraffur.py
+verlaufsschraffur_uniform.py
 
-Erzeugt eine Verlaufs-Punktschraffur entlang einer Schnittkante (Terrain-Schnitt).
-Alle Funktionen liegen auf Modulebene (keine verschachtelten Definitionen).
+Gleichmaessige Punktverteilung mit maximaler Dichte innerhalb einer
+geschlossenen Kurve CB. Nutzt dieselbe Kandidaten-Generierung und denselben
+Spatial-Hash-Cull wie verlaufsschraffur_kurve_kurve, aber ohne Gradient
+(kein C1/C0/gamma) - min_dist ist hier der einzige dichtebestimmende Faktor.
 
 Verwendung in GhPython:
 
@@ -11,29 +13,29 @@ Verwendung in GhPython:
     if path not in sys.path:
         sys.path.append(path)
 
-    import verlaufsschraffur
+    import verlaufsschraffur_uniform
     from importlib import reload
-    reload(verlaufsschraffur)   # nur waehrend der Entwicklung noetig
+    reload(verlaufsschraffur_uniform)
 
-    points = verlaufsschraffur.verlaufsschraffur(
-        x_domain, y_domain, N, CB, C1, C0, cell_size, gamma, min_dist
+    points = verlaufsschraffur_uniform.punktschraffur(
+        x_domain, y_domain, N, CB, min_dist
     )
 
 Inputs (GH-Component):
     x_domain, y_domain : Domain
-    N                   : int   - grobe Ziel-Punktanzahl vor Filterung/Cull
-    CB, C1, C0          : Curve - Begrenzung, aeussere/innere Referenzkurve
-    cell_size           : float - Rastergroesse fuer Kandidaten-Generierung
-    gamma               : float - Formfaktor der Abnahme (t**gamma). <1 = zuerst
-                          schnellerer, dann langsamerer Abfall. 1.0 = linear (Original).
-    min_dist            : float - Mindestabstand zwischen Punkten (ersetzt CullDuplicates)
+    N                   : int   - grobe Ziel-Kandidatenanzahl vor Cull (grosszuegig
+                          waehlen, z.B. 3-5x mehr als die erwartete finale Punktzahl,
+                          damit min_dist tatsaechlich der limitierende Faktor ist)
+    CB                  : Curve - geschlossene Begrenzungskurve
+    min_dist            : float - Mindestabstand zwischen Punkten (bestimmt die
+                          maximale Dichte, gleich wie im Gradient-Script)
 """
 
-import random
 import numpy as np
 
-from compas.geometry import Point, Polyline
+from compas.geometry import Point
 from compas_rhino.conversions import curve_to_compas_polyline, point_to_rhino
+from compas.geometry import Polyline
 
 
 def curve_to_polyline_safe(curve, segments=50):
@@ -47,11 +49,20 @@ def curve_to_polyline_safe(curve, segments=50):
         return Polyline([[p.X, p.Y, p.Z] for p in pts])
 
 
+def parse_domain(domain):
+    """Akzeptiert sowohl ein echtes Rhino.Geometry.Interval (.T0/.T1) als auch
+       den String-Fallback, den GH-Domain-Inputs im rhinocode-CPython-Component
+       liefern koennen, z.B. '120.01 To 140.33'."""
+    if hasattr(domain, "T0") and hasattr(domain, "T1"):
+        return float(domain.T0), float(domain.T1)
+    a, b = str(domain).lower().split("to")
+    return float(a.strip()), float(b.strip())
+
+
 def deconstruct_domain_pair(x_domain, y_domain):
     """Zerlegt zwei GH-Domains in x0, x1, y0, y1."""
-    import ghpythonlib.components as gh
-    x0, x1 = gh.DeconstructDomain(x_domain)
-    y0, y1 = gh.DeconstructDomain(y_domain)
+    x0, x1 = parse_domain(x_domain)
+    y0, y1 = parse_domain(y_domain)
     return x0, x1, y0, y1
 
 
@@ -77,19 +88,6 @@ def points_in_polygon_xy(points_xy, poly_xy):
     return inside
 
 
-def min_dist_to_polyline(points_xy, poly_xy):
-    """Vektorisierter minimaler Abstand jedes Punkts zu einer Polyline (Segment-Projektion)."""
-    a = poly_xy[:-1]
-    b = poly_xy[1:]
-    ab = b - a
-    ab_len2 = np.maximum(np.sum(ab ** 2, axis=1), 1e-12)
-    ap = points_xy[:, None, :] - a[None, :, :]
-    t = np.clip(np.sum(ap * ab[None, :, :], axis=2) / ab_len2[None, :], 0.0, 1.0)
-    proj = a[None, :, :] + t[:, :, None] * ab[None, :, :]
-    d = np.linalg.norm(points_xy[:, None, :] - proj, axis=2)
-    return d.min(axis=1)
-
-
 def generate_candidate_grid(x0, x1, y0, y1, cell_size, n_per_cell):
     """Erzeugt zufaellige Kandidatenpunkte, gleichmaessig auf ein Zellenraster verteilt."""
     cols = max(int((x1 - x0) // cell_size + (1 if (x1 - x0) % cell_size else 0)), 1)
@@ -105,15 +103,6 @@ def generate_candidate_grid(x0, x1, y0, y1, cell_size, n_per_cell):
     rand_y = np.random.uniform(0.0, cell_size, size=col_idx.shape[0])
 
     return np.column_stack([x_min + rand_x, y_min + rand_y])
-
-
-def calculate_thresholds(points_xy, c0_xy, c1_xy):
-    """t = 0 an c0 (dichte Kante), t = 1 an c1 (verlaufsende), vektorisiert."""
-    d0 = min_dist_to_polyline(points_xy, c0_xy)
-    d1 = min_dist_to_polyline(points_xy, c1_xy)
-    dmax = d0 + d1
-    dmax = np.where(dmax == 0, 1e-12, dmax)
-    return d0 / dmax
 
 
 def cull_duplicates(points_xy, min_dist):
@@ -155,15 +144,10 @@ def cull_duplicates(points_xy, min_dist):
     return points_xy[keep_mask]
 
 
-def verlaufsschraffur_kurve_kurve(x_domain, y_domain, N, CB, C1, C0, cell_size, gamma, min_dist):
-    """Hauptfunktion: von GhPython aus aufrufen."""
+def punktschraffur(x_domain, y_domain, N, CB, cell_size, min_dist):
+    """Hauptfunktion: von GhPython aus aufrufen. Gleichmaessige Verteilung, max. Dichte."""
     cb = curve_to_polyline_safe(CB)
-    c1 = curve_to_polyline_safe(C1)
-    c0 = curve_to_polyline_safe(C0)
-
     cb_xy = polyline_to_xy_array(cb)
-    c1_xy = polyline_to_xy_array(c1)
-    c0_xy = polyline_to_xy_array(c0)
 
     x0, x1, y0, y1 = deconstruct_domain_pair(x_domain, y_domain)
 
@@ -177,11 +161,6 @@ def verlaufsschraffur_kurve_kurve(x_domain, y_domain, N, CB, C1, C0, cell_size, 
     candidates = candidates[inside_cb]
     if len(candidates) == 0:
         return []
-
-    t = calculate_thresholds(candidates, c0_xy, c1_xy)
-    t_shaped = t ** gamma
-    rnd = np.random.random(size=t_shaped.shape[0])
-    candidates = candidates[t_shaped >= rnd]
 
     candidates = cull_duplicates(candidates, min_dist)
 

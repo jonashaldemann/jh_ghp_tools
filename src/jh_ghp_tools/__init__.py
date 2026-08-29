@@ -12,11 +12,11 @@ from .apply_box_mapping import apply_box_mapping
 from .point_two_closest_points import point_two_closest_points
 from .baeume_staffelung import baeume_staffelung
 from .bake_box_map import bake_box_map
-from .verlaufsschraffur import verlaufsschraffur
 from .random_lines_from_points import random_lines_from_points
 from .get_guid_object_name import get_guid_object_name
 from .gruppieren_nach_string import gruppieren_nach_string
-from .verlaufsschrafur_kurve_kurve import verlaufsschraffur_kurve_kurve
+from .verlaufsschraffur_kurve_kurve import verlaufsschraffur_kurve_kurve
+from .punktschraffur import punktschraffur
 
 __author__ = "Jonas Haldemann"
 __copyright__ = "2025, Jonas Haldemann"
@@ -39,9 +39,9 @@ __all__ = [
     "point_two_closest_points",
     "baeume_staffelung",
     "bake_box_map",
-    "verlaufsschraffur",
     "random_lines_from_points",
     "get_guid_object_name",
     "gruppieren_nach_string",
-    "verlaufsschrafur_kurve_kurve"
+    "verlaufsschraffur_kurve_kurve",
+    "punktschraffur"
 ]
