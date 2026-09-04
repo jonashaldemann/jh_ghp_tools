@@ -17,6 +17,7 @@ from .get_guid_object_name import get_guid_object_name
 from .gruppieren_nach_string import gruppieren_nach_string
 from .verlaufsschraffur_kurve_kurve import verlaufsschraffur_kurve_kurve
 from .punktschraffur import punktschraffur
+from .bake_objects_to_layers import bake_objects_to_layers
 
 __author__ = "Jonas Haldemann"
 __copyright__ = "2025, Jonas Haldemann"
@@ -43,5 +44,6 @@ __all__ = [
     "get_guid_object_name",
     "gruppieren_nach_string",
     "verlaufsschraffur_kurve_kurve",
-    "punktschraffur"
+    "punktschraffur",
+    "bake_objects_to_layers"
 ]
